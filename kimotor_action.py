@@ -67,31 +67,29 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
     rules = None
 
     rules_preset_jlcpcb12 = {
-        "track_width":  0.127, # (5mil)
-        "track_space":  0.127, # (5mil)
+        "track_width":  1.0, # (5mil)
+        "track_space":  0.2, # (5mil)
         "via_hole":     0.3,
         "via_diameter": 0.5,
     } 
 
     rules_preset_jlcpcb4 = {
-        "track_width":  0.09, # (3.5mil)
-        "track_space":  0.09, # (3.5mil)
-        "via_hole":     0.15,
-        "via_diameter": 0.25,
+        "track_width":  1.0, # (3.5mil)
+        "track_space":  0.2, # (3.5mil)
+        "via_hole":     0.3,
+        "via_diameter": 0.5,
     } 
 
 
     # terminal footprint dict
-    term_tht_db = {
-        "0.1"   : "SolderWire-0.1sqmm_1x01_D0.4mm_OD1mm",
-        "0.15"  : "SolderWire-0.15sqmm_1x01_D0.5mm_OD1.5mm",
-        "0.25"  : "SolderWire-0.25sqmm_1x01_D0.65mm_OD1.7mm",
-        "0.5"   : "SolderWire-0.5sqmm_1x01_D0.9mm_OD2.1mm",
-        "0.75"  : "SolderWire-0.75sqmm_1x01_D1.25mm_OD2.3mm",
-        "1.0"   : "SolderWire-1sqmm_1x01_D1.4mm_OD2.7mm",
-        "1.5"   : "SolderWire-1.5sqmm_1x01_D1.7mm_OD3.9mm",
-        "2.0"   : "SolderWire-2sqmm_1x01_D2mm_OD3.9mm",
-        "2.5"   : "SolderWire-2.5sqmm_1x01_D2.4mm_OD3.6mm"
+    term_tht_db = { # kasim
+        "M2"    : "MountingHole_2.2mm_M2_Pad",
+        "M2.5"  : "MountingHole_2.7mm_M2.5_Pad",
+        "M3"    : "MountingHole_3.2mm_M3_Pad",
+        "M3.5"  : "MountingHole_3.7mm_M3.5_Pad",
+        "M4"    : "MountingHole_4.3mm_M4_Pad",
+        "M5"    : "MountingHole_5.3mm_M5_Pad",
+        "M6"    : "MountingHole_6.4mm_M6_Pad",
     }
     term_smd_db = {
         "1"     : "TestPoint_Pad_1.0x1.0mm",
@@ -106,7 +104,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         "SMD"   : term_smd_db
     }
 
-    mhole_db = {
+    mhole_db = { # kasim
         "M2"    : "MountingHole_2.2mm_M2_Pad",
         "M2.5"  : "MountingHole_2.7mm_M2.5_Pad",
         "M3"    : "MountingHole_3.2mm_M3_Pad",
@@ -114,7 +112,6 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         "M4"    : "MountingHole_4.3mm_M4_Pad",
         "M5"    : "MountingHole_5.3mm_M5_Pad",
         "M6"    : "MountingHole_6.4mm_M6_Pad",
-        "M8"    : "MountingHole_8.4mm_M8_Pad",
     }
 
     def __init__(self,  parent, board):
@@ -362,7 +359,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         
         # terminals
         if self.trmtype != "None":
-            trm_lib = self.fp_path + ('Connector_Wire.pretty' if self.trmtype=='THT' else 'TestPoint.pretty')
+            trm_lib = self.fp_path + ('MountingHole.pretty' if self.trmtype=='THT' else 'TestPoint.pretty') # kasim
             trm_fp = self.term_db.get(self.trmtype).get(self.m_termSize.GetStringSelection())
 
             self.do_terminals(
@@ -536,7 +533,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         for slot in range(n_slots):
             pgroup = pcbnew.PCB_GROUP( self.board )
             pgroup.SetName("slot_"+str(slot))
-            self.board.Add(pgroup)
+            self.board.Add(pgroup) # kasim
 
             # start/end points of single winding
             winding_se = []
@@ -574,12 +571,12 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
                     iv = math.floor(i/2)
 
                     # via index
-                    viv = vias[iv]
+                    viv = vias[iv]*2   # 1 kasim
 
                     # via coordinates
                     xy_v = self.fpoint( 
-                        int(r_via_o*math.cos(th + thv_o*viv)), 
-                        int(r_via_o*math.sin(th + thv_o*viv)))
+                        int(r_via_o*math.cos(th + thv_o*viv)),  
+                        int(r_via_o*math.sin(th + thv_o*viv)))  
                     
                     # stitch
                     via = pcbnew.PCB_VIA(self.board)
@@ -601,8 +598,8 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
                             int((r_via_o+r_clear)*math.sin(th + thv_o*vias[iv]))))
                     a.SetMid(
                         self.fpoint( 
-                            int((r_via_o+r_clear)*math.cos(th + thv_o*vias[iv] /2 )), 
-                            int((r_via_o+r_clear)*math.sin(th + thv_o*vias[iv] /2 ))))
+                            int((r_via_o+r_clear)*math.cos(th + thv_o*vias[iv] /2 )),   
+                            int((r_via_o+r_clear)*math.sin(th + thv_o*vias[iv] /2 ))))  
                     self.board.Add(a)
 
                     if viv > 0:
@@ -626,15 +623,15 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
                     t.SetWidth( self.trk_w )
                     t.SetLayer( lset[i] )
                     t.SetStart( a.GetEnd() )
-                    t.SetEnd( xy_v )
-                    self.board.Add(t)
+                    t.SetEnd( xy_v ) 
+                    self.board.Add(t) 
                     t = pcbnew.PCB_TRACK(self.board)
                     a.SetNet(net_coil)
                     t.SetWidth( self.trk_w )
                     t.SetLayer( lset[i-1] )
                     t.SetStart( a.GetEnd() )
                     t.SetEnd( xy_v )
-                    self.board.Add(t)
+                    self.board.Add(t) 
 
                 # on even layers (coil CW), but first, stitch coils' start points
                 elif not i%2 and i>0:
@@ -642,7 +639,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
                     iv = int(i/2)
 
                     # via index
-                    viv = vias[iv]
+                    viv = vias[iv]*2   # 1 kasim
 
                     xy_v = self.fpoint( 
                         int(r_via*math.cos(th + thv*viv)), 
@@ -724,7 +721,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         """
 
         # rings spaced from coils
-        r_in -= 2*dr
+        r_in -= 3*dr # kasim
 
         # slot angular width
         th0 = 2*math.pi/n_slot
@@ -743,9 +740,14 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
         # create phase tracks
         for p in range(n_phase):
 
+        
             # radial location of the ring
-            cri = r_in - p*dr
-            
+            if(p==0):
+                cri = r_in - 1*(p+1)*dr  # 1 kasim, important for SC
+            elif(p==1):
+                cri = r_in - 2*(p+1)*dr  # 1 kasim, important for SC
+            else:
+                cri = r_in - 2.35*(p+1)*dr  # 1 kasim, important for SC
             
             thv = math.atan2(2*self.trk_w,cri)
 
@@ -1200,7 +1202,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
 
         z.SetLayerSet(nls)
         z.SetIslandRemovalMode(pcbnew.ISLAND_REMOVAL_MODE_NEVER)
-        self.board.Add(z)
+        #self.board.Add(z)   # kasim, activate it
 
         z = pcbnew.ZONE(self.board)
         cpl = kla.circle_to_polygon(r_nosm_in, 100)
@@ -1245,14 +1247,14 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
 
         # pcb label
         pcb_txt = pcbnew.PCB_TEXT(self.board)
-        pcb_txt.SetText(
-            datetime.today().strftime('%Y%m%d') + 
-            "_ly" + str(self.n_layers) +
-            "_s" + str(self.n_slots) +
-            "_w" + str(self.n_loops)
+        pcb_txt.SetText( # kasim
+            datetime.today().strftime('%Y/%m/%d') + 
+            " L" + str(self.n_layers) +
+            "_S" + str(self.n_slots) +
+            "_N" + str(self.n_loops)
         )
-        pcb_txt.SetPosition( self.fpoint(0,self.txt_loc) )
-        pcb_txt.SetTextSize( self.fsize(self.txt_size,self.txt_size) )
+        pcb_txt.SetPosition( self.fpoint(0,-1*self.txt_loc) ) # kasim
+        pcb_txt.SetTextSize( self.fsize(self.txt_size*4,self.txt_size*4) ) # kasim
         pcb_txt.SetLayer(pcbnew.F_SilkS)
         self.board.Add(pcb_txt)
 
