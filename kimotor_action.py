@@ -371,11 +371,11 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
 
         # create outline, mounting holes and thermal zones
         if self.outline != "None":
-            self.do_outline(
-                self.r_in, 
-                self.r_out, 
-                self.n_edges, 
-                self.o_fill)
+            #self.do_outline( # kasim
+             #   self.r_in, 
+              #  self.r_out, 
+               # self.n_edges, 
+                #self.o_fill)
             
             self.do_mounting_holes(
                 self.r_mh_out,
