@@ -779,6 +779,7 @@ class KiMotorDialog ( kimotor_gui.KiMotorGUI ):
 
             # star-connection on 1st phase ring
             if p==0:
+                cri = r_in - 3*(p+1)*dr  # 1 kasim, important for SC
                 # find directions
                 ths = -3*th0 + th0/2 - thv
                 the = -1*th0 + th0/2 - thv
